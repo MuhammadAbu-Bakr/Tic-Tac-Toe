@@ -31,3 +31,11 @@ A simple **Tic Tac Toe** game developed in **Java** using **Java Swing** for the
 - Structuring a game loop and managing player turns
 - Using java.util.Random to simulate simple AI behavior
 - Writing modular code with separation between UI, logic, and AI
+
+
+## 🚀 How to Run
+
+1. Clone or download the repository:
+   ```bash
+   git clone https://github.com/MuhammadAbu-Bakr/Tic-Tac-Toe
+   cd Tic-Tac-Toe
