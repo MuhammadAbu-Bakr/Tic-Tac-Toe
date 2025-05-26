@@ -9,6 +9,132 @@ import java.util.Random;
  * @author Muhammad AbuBakr
  *  
  */
+class PlayOptionsScreen extends JFrame {
+    public PlayOptionsScreen() {
+        setTitle("Play Options");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(300, 400);
+        setLocationRelativeTo(null);
+
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        JLabel titleLabel = new JLabel("Select Game Mode");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        mainPanel.add(titleLabel, gbc);
+
+        JButton singlePlayerBtn = new JButton("Single Player");
+        JButton multiPlayerBtn = new JButton("Multi Player");
+        JButton backBtn = new JButton("Back to Menu");
+
+        singlePlayerBtn.setPreferredSize(new Dimension(200, 40));
+        multiPlayerBtn.setPreferredSize(new Dimension(200, 40));
+        backBtn.setPreferredSize(new Dimension(200, 40));
+
+        gbc.gridwidth = 1;
+        gbc.gridy = 1;
+        mainPanel.add(singlePlayerBtn, gbc);
+
+        gbc.gridy = 2;
+        mainPanel.add(multiPlayerBtn, gbc);
+
+        gbc.gridy = 3;
+        mainPanel.add(backBtn, gbc);
+
+        singlePlayerBtn.addActionListener(e -> {
+            TicTacToe game = new TicTacToe(true);
+            game.setVisible(true);
+            dispose();
+        });
+
+        multiPlayerBtn.addActionListener(e -> {
+            TicTacToe game = new TicTacToe(false);
+            game.setVisible(true);
+            dispose();
+        });
+
+        backBtn.addActionListener(e -> {
+            dispose();
+            new MenuScreen().setVisible(true);
+        });
+
+        add(mainPanel);
+    }
+}
+
+class MenuScreen extends JFrame {
+    public MenuScreen() {
+        setTitle("Tic-Tac-Toe Menu");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(400, 500);
+        setLocationRelativeTo(null);
+
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        JLabel titleLabel = new JLabel("Tic-Tac-Toe");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        mainPanel.add(titleLabel, gbc);
+
+        JButton playBtn = new JButton("1. Play");
+        JButton optionsBtn = new JButton("2. Options");
+        JButton leaderboardBtn = new JButton("3. Leaderboard");
+        JButton aboutBtn = new JButton("4. About");
+        JButton quitBtn = new JButton("5. Quit");
+
+        playBtn.setPreferredSize(new Dimension(200, 40));
+        optionsBtn.setPreferredSize(new Dimension(200, 40));
+        leaderboardBtn.setPreferredSize(new Dimension(200, 40));
+        aboutBtn.setPreferredSize(new Dimension(200, 40));
+        quitBtn.setPreferredSize(new Dimension(200, 40));
+
+        gbc.gridwidth = 1;
+        gbc.gridy = 1;
+        mainPanel.add(playBtn, gbc);
+
+        gbc.gridy = 2;
+        mainPanel.add(optionsBtn, gbc);
+
+        gbc.gridy = 3;
+        mainPanel.add(leaderboardBtn, gbc);
+
+        gbc.gridy = 4;
+        mainPanel.add(aboutBtn, gbc);
+
+        gbc.gridy = 5;
+        mainPanel.add(quitBtn, gbc);
+
+        playBtn.addActionListener(e -> {
+            dispose();
+            new PlayOptionsScreen().setVisible(true);
+        });
+
+        optionsBtn.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Options feature coming soon!");
+        });
+
+        leaderboardBtn.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Leaderboard feature coming soon!");
+        });
+
+        aboutBtn.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "About section coming soon!");
+        });
+
+        quitBtn.addActionListener(e -> System.exit(0));
+
+        add(mainPanel);
+    }
+}
+
 public class TicTacToe extends JFrame {
     // Game settings
     private static final int BOARD_SIZE = 3;
@@ -33,7 +159,8 @@ public class TicTacToe extends JFrame {
     private JLabel player2ScoreLabel;
     private JPanel boardPanel;
 
-    public TicTacToe() {
+    public TicTacToe(boolean singlePlayer) {
+        this.isSinglePlayer = singlePlayer;
         initializeUI();
         resetGame();
     }
@@ -44,15 +171,12 @@ public class TicTacToe extends JFrame {
         setSize(500, 500);
         setLocationRelativeTo(null);
 
-        
         JPanel mainPanel = new JPanel(new BorderLayout());
         getContentPane().add(mainPanel);
 
-       
         boardPanel = new JPanel(new GridLayout(BOARD_SIZE, BOARD_SIZE));
         mainPanel.add(boardPanel, BorderLayout.CENTER);
 
-        
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 JButton button = new JButton();
@@ -65,7 +189,6 @@ public class TicTacToe extends JFrame {
             }
         }
 
-        // Control panel for scores and turn
         JPanel controlPanel = new JPanel(new GridLayout(3, 1));
         turnLabel = new JLabel(TURN_TEXT + (turn + 1), SwingConstants.CENTER);
         turnLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -79,16 +202,21 @@ public class TicTacToe extends JFrame {
         controlPanel.add(player2ScoreLabel);
         mainPanel.add(controlPanel, BorderLayout.SOUTH);
 
-        // Menu bar
         JMenuBar menuBar = new JMenuBar();
         JMenu optionsMenu = new JMenu("Options");
-        JMenuItem resetMenuItem = new JMenuItem("Reset");
+        JMenuItem newGameItem = new JMenuItem("New Game");
+        JMenuItem backToMenuItem = new JMenuItem("Back to Menu");
         JMenuItem exitMenuItem = new JMenuItem("Exit");
 
-        resetMenuItem.addActionListener(e -> resetGame());
+        newGameItem.addActionListener(e -> resetGame());
+        backToMenuItem.addActionListener(e -> {
+            dispose();
+            new MenuScreen().setVisible(true);
+        });
         exitMenuItem.addActionListener(e -> System.exit(0));
 
-        optionsMenu.add(resetMenuItem);
+        optionsMenu.add(newGameItem);
+        optionsMenu.add(backToMenuItem);
         optionsMenu.add(exitMenuItem);
         menuBar.add(optionsMenu);
         setJMenuBar(menuBar);
@@ -112,53 +240,150 @@ public class TicTacToe extends JFrame {
     }
 
     private void updateUI() {
-        turnLabel.setText(TURN_TEXT + (turn + 1));
+        if (isSinglePlayer) {
+            turnLabel.setText("Player's Turn");
+        } else {
+            turnLabel.setText(turn % 2 == 0 ? "Player 1's Turn" : "Player 2's Turn");
+        }
         player1ScoreLabel.setText(PLAYER_1_SCORE_TEXT + player1Score);
         player2ScoreLabel.setText(PLAYER_2_SCORE_TEXT + player2Score);
     }
 
     private void handleButtonClick(int row, int col) {
         if (board[row][col] == ' ') {
-            board[row][col] = PLAYER_SYMBOL;
-            buttons[row][col].setText(String.valueOf(PLAYER_SYMBOL));
-
-            if (checkWin(PLAYER_SYMBOL)) {
-                JOptionPane.showMessageDialog(this, "Player 1 wins!");
-                player1Score++;
-                lockBoard();
-            } else if (isBoardFull()) {
-                JOptionPane.showMessageDialog(this, "It's a draw!");
+            if (isSinglePlayer) {
+                makePlayerMove(row, col);
+                if (!isBoardFull() && !checkWin(PLAYER_SYMBOL)) {
+                    makeComputerMove();
+                }
             } else {
-                turn++;
-                if (isSinglePlayer) {
-                    computerMove();
+                if (turn % 2 == 0) {
+                    makePlayer1Move(row, col);
+                } else {
+                    makePlayer2Move(row, col);
                 }
             }
-            updateUI();
         }
     }
 
-    private void computerMove() {
-        boolean moveMade = false;
-        while (!moveMade) {
-            int row = random.nextInt(BOARD_SIZE);
-            int col = random.nextInt(BOARD_SIZE);
+    private void makePlayer1Move(int row, int col) {
+        board[row][col] = PLAYER_SYMBOL;
+        buttons[row][col].setText(String.valueOf(PLAYER_SYMBOL));
+        buttons[row][col].setEnabled(false);
 
-            if (board[row][col] == ' ') {
-                board[row][col] = COMPUTER_SYMBOL;
-                buttons[row][col].setText(String.valueOf(COMPUTER_SYMBOL));
+        if (checkWin(PLAYER_SYMBOL)) {
+            JOptionPane.showMessageDialog(this, "Player 1 wins!");
+            player1Score++;
+            lockBoard();
+        } else if (isBoardFull()) {
+            JOptionPane.showMessageDialog(this, "It's a draw!");
+            lockBoard();
+        } else {
+            turn++;
+        }
+        updateUI();
+    }
 
-                if (checkWin(COMPUTER_SYMBOL)) {
-                    JOptionPane.showMessageDialog(this, "Computer wins!");
-                    player2Score++;
-                    lockBoard();
-                } else if (isBoardFull()) {
-                    JOptionPane.showMessageDialog(this, "It's a draw!");
-                } else {
-                    turn++;
+    private void makePlayer2Move(int row, int col) {
+        board[row][col] = COMPUTER_SYMBOL;
+        buttons[row][col].setText(String.valueOf(COMPUTER_SYMBOL));
+        buttons[row][col].setEnabled(false);
+
+        if (checkWin(COMPUTER_SYMBOL)) {
+            JOptionPane.showMessageDialog(this, "Player 2 wins!");
+            player2Score++;
+            lockBoard();
+        } else if (isBoardFull()) {
+            JOptionPane.showMessageDialog(this, "It's a draw!");
+            lockBoard();
+        } else {
+            turn++;
+        }
+        updateUI();
+    }
+
+    private void makePlayerMove(int row, int col) {
+        board[row][col] = PLAYER_SYMBOL;
+        buttons[row][col].setText(String.valueOf(PLAYER_SYMBOL));
+        buttons[row][col].setEnabled(false);
+
+        if (checkWin(PLAYER_SYMBOL)) {
+            JOptionPane.showMessageDialog(this, "Player wins!");
+            player1Score++;
+            lockBoard();
+        } else if (isBoardFull()) {
+            JOptionPane.showMessageDialog(this, "It's a draw!");
+            lockBoard();
+        }
+        updateUI();
+    }
+
+    private void makeComputerMove() {
+        int[] move = findBestMove();
+        int row = move[0];
+        int col = move[1];
+        
+        board[row][col] = COMPUTER_SYMBOL;
+        buttons[row][col].setText(String.valueOf(COMPUTER_SYMBOL));
+        buttons[row][col].setEnabled(false);
+
+        if (checkWin(COMPUTER_SYMBOL)) {
+            JOptionPane.showMessageDialog(this, "Computer wins!");
+            player2Score++;
+            lockBoard();
+        } else if (isBoardFull()) {
+            JOptionPane.showMessageDialog(this, "It's a draw!");
+            lockBoard();
+        }
+        updateUI();
+    }
+
+    private int[] findBestMove() {
+        int[] move = new int[2];
+        
+        if (board[1][1] == ' ') {
+            move[0] = 1;
+            move[1] = 1;
+            return move;
+        }
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (board[i][j] == ' ') {
+                    board[i][j] = COMPUTER_SYMBOL;
+                    if (checkWin(COMPUTER_SYMBOL)) {
+                        board[i][j] = ' ';
+                        move[0] = i;
+                        move[1] = j;
+                        return move;
+                    }
+                    board[i][j] = ' ';
                 }
-                moveMade = true;
-                updateUI();
+            }
+        }
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (board[i][j] == ' ') {
+                    board[i][j] = PLAYER_SYMBOL;
+                    if (checkWin(PLAYER_SYMBOL)) {
+                        board[i][j] = ' ';
+                        move[0] = i;
+                        move[1] = j;
+                        return move;
+                    }
+                    board[i][j] = ' ';
+                }
+            }
+        }
+
+        while (true) {
+            int i = random.nextInt(BOARD_SIZE);
+            int j = random.nextInt(BOARD_SIZE);
+            if (board[i][j] == ' ') {
+                move[0] = i;
+                move[1] = j;
+                return move;
             }
         }
     }
@@ -216,8 +441,7 @@ public class TicTacToe extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            TicTacToe game = new TicTacToe();
-            game.setVisible(true);
+            new MenuScreen().setVisible(true);
         });
     }
 }
